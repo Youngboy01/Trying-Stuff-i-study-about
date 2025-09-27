@@ -10,6 +10,17 @@ def get_dataset():
 def get_processor(processor_name):
     return ViTImageProcessor.from_pretrained(processor_name)
 
+def preprocess_data(example, processor, label2id):
+    # Convert to RGB 
+    example['image'] = example['image'].convert('RGB')
+
+    # pass image into processor
+    inputs = processor(example['image'], return_tensors='pt')
+
+    # Add to example (pixel_values) and encode the label
+    example['pixel_values'] = inputs['pixel_values'].squeeze()
+    example['label'] = label2id[example['label']]
+    return example
 
 def label2id_and_id2label(train_dataset):
     sorted_labels = sorted(list(set(train_dataset["label"])))
